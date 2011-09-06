@@ -1,4 +1,4 @@
-!((context) ->
+!((timeout) ->
     _timeouts = {}
     timeout.timeout = (name, delay, fn) ->
         if typeof name == 'string'
