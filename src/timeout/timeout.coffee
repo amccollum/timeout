@@ -1,22 +1,21 @@
 !((timeout) ->
     _timeouts = {}
+    _maxId = 0
+    
     timeout.timeout = (name, delay, fn) ->
         if typeof name == 'string'
             args = Array.prototype.slice.call(arguments, 3)
-            if name of _timeouts
-                data = _timeouts[name]
-                clearTimeout(data.id)
-            else
-                _timeouts[name] = data = {}
-        
         else
             # Shift arguments over
             fn = delay
             delay = name
-            name = null
-
-            args = Array.prototype.slice.call(arguments, 2)
-            data = {}
+            name = "_timeout__#{++_maxId}"
+        
+        if name of _timeouts
+            data = _timeouts[name]
+            clearTimeout(data.id)
+        else
+            _timeouts[name] = data = {}
         
         if fn
             resetTimeout = () -> data.id = setTimeout(data.fn, delay)
@@ -28,10 +27,14 @@
             
             resetTimeout()
             
+            return name
+            
         else
             if delay?
-                data.fn()
+                return data.fn()
+            else if name of _timeouts
+                return delete _timeouts[name]
             else
-                delete _timeouts[name]
+                return false
 
 )(exports ? (@['timeout'] = {}))
